@@ -4,41 +4,71 @@
 // Look at how beautiful my new object is! Maybe send it as json?
 // Compare it to lists on Disneyland.com and Wikipedia.
 
-var fs = require('fs');
-var request = require('request');
+// inspired by http://www.html5rocks.com/en/tutorials/es6/promises/
+function get(url) {
+  return new Promise(function(resolve, reject) {
 
-request('https://touringplans.com/disneyland/attractions.json', function(error, response, json) {
-  if (error) return console.log('error on first request:', error);
+    var req = new XMLHttpRequest(); // part of the Web API
+    req.open('GET', url);
 
-  // Create an object with the attractions data.
-  var attractionsArray = JSON.parse(json);
-  // console.log(attractionsObject); // For testing only
-
-  // Use a loop to create promises?
-
-  var promise = new Promise(function(resolve, reject) {
-    var linkToVisit = 'https://touringplans.com/disneyland/attractions/' + attractionsArray[0].permalink + '.json';
-
-    request(linkToVisit, function(error, response, json) {
-      if (error) {
-        console.log('error on request for', attractionsArray[0].name, '-', error);
+    req.onload = function() {
+      if (req.status === 200) {
+        resolve(req.response);
       } else {
-        attractionsArray[0].opened_on = json.opened_on;
+        reject(Error(req.statusText));
       }
-    });
+    };
 
-    if (attractionsArray[0].opened_on) {
-      resolve('Request successful!');
-    } else {
-      reject(Error('Request unsuccessful'));
-    }
-  });
+    req.onerror = function() {
+      reject(Error('Network Error'));
+    };
 
-  promise.then(function(result) {
-    console.log('result in .then:', result);
-  }, function(err) {
-    console.log('error in .then:', err)
-  });
+    req.send();
+  })
+}
+
+get('https://touringplans.com/disneyland/attractions/').then(function(response) {
+  console.log('Success!', response);
+}, function(error) {
+  console.log('Failed!', error);
+});
+
+// OLD
+// var fs = require('fs');
+// var request = require('request');
+//
+// request('https://touringplans.com/disneyland/attractions.json', function(error, response, json) {
+//   if (error) return console.log('error on first request:', error);
+//
+//   // Create an object with the attractions data.
+//   var attractionsArray = JSON.parse(json);
+//   // console.log(attractionsObject); // For testing only
+//
+//   // Use a loop to create promises?
+//
+//   var promise = new Promise(function(resolve, reject) {
+//     var linkToVisit = 'https://touringplans.com/disneyland/attractions/' + attractionsArray[0].permalink + '.json';
+//
+//     request(linkToVisit, function(error, response, json) {
+//       if (error) {
+//         console.log('error on request for', attractionsArray[0].name, '-', error);
+//       } else {
+//         attractionsArray[0].opened_on = json.opened_on;
+//       }
+//     });
+//
+//     if (attractionsArray[0].opened_on) {
+//       resolve('Request successful!');
+//     } else {
+//       reject(Error('Request unsuccessful'));
+//     }
+//   });
+//
+//   promise.then(function(result) {
+//     console.log('result in .then:', result);
+//   }, function(err) {
+//     console.log('error in .then:', err)
+//   });
 
   // Modify each attraction in this array.
   // attractionsArray.forEach(function(attraction) {
@@ -53,4 +83,4 @@ request('https://touringplans.com/disneyland/attractions.json', function(error, 
   // fs.writeFile('attractions.json', json, function() {
   //   console.log('Finished writing data from first request to file');
   // });
-});
+// });
