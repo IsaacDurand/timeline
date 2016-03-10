@@ -11,7 +11,7 @@ app.get('/main.js', function(req, res) {
 });
 
 app.get('/attractions', function(req, res) {
-	res.sendFile(path.join(__dirname, 'attractions.json'));
+	res.sendFile(path.join(__dirname, '../data/attractions.json'));
 });
 
 app.listen(3000);
