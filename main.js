@@ -6,6 +6,7 @@
 
 console.log('main.js is running');
 var axios = require('axios');
+var fs = require('fs');
 
 // inspired by http://www.html5rocks.com/en/tutorials/es6/promises/ and https://github.com/mzabriskie/axios
 function get(url) {
@@ -15,42 +16,75 @@ function get(url) {
       .then(function(response) {
         resolve(response);
       })
-      . catch(function(response) {
+      .catch(function(response) {
         reject(Error(response));
       });
-  })
+  });
 }
+
+function getOpeningDate(attraction) {
+  var url = attraction.fullLink;
+
+  return new Promise(function(resolve, reject) {
+
+    axios.get(url)
+      .then(function(response) {
+        resolve(response.data.opened_on);
+      })
+      .catch(function(response) {
+        reject(Error(response));
+      });
+  });
+}
+
+// I tested this function, and it works.
+// function getOpeningDate(url) {
+//   return new Promise(function(resolve, reject) {
+//
+//     axios.get(url)
+//       .then(function(response) {
+//         resolve(response.data.opened_on);
+//       })
+//       .catch(function(response) {
+//         reject(Error(response));
+//       });
+//   });
+// }
+
+// getOpeningDate('https://touringplans.com/disneyland/attractions/tarzans-treehouse.json')
+//   .then(function(response) {
+//     console.log('opening date:', response);
+//   }, function(error) {
+//     console.log('Request for opening date failed.');
+//   });
+
+var attractions; // I need to declare attractions outside the chain so that it's defined throughout.
 
 get('https://touringplans.com/disneyland/attractions.json')
   .then(function(response) {
-    console.log('Success!');
+    console.log('Request for attractions list successful!');
     // response.data is an array containing attraction objects.
-    var attractions = response.data;
 
+    attractions = response.data;
     attractions.forEach(function(attraction) {
-      attraction.URL = 'https://touringplans.com/disneyland/attractions/' + attraction.permalink + '.json';
+      attraction.fullLink = 'https://touringplans.com/disneyland/attractions/' + attraction.permalink + '.json';
     });
+    // Now atttractions contains the fullLink of each attraction.
 
-    // Now atttractions contains the full URL of each attraction.
+    return Promise.all(
+      attractions.map(getOpeningDate)
+    );
 
-    console.log(attractions);
-
-    response.data.forEach(function(attraction) {
-      console.log(attraction.name);
+  }).then(function(openingDates) {
+    attractions.forEach(function(attraction, index) {
+      attraction.opened_on = openingDates[index];
     })
+    // Now attractions contains the opening date of each attraction. 
 
-    var attractionURLs = response.data.map(function(atraction) {
-      return 'https://touringplans.com/disneyland/attractions/' + attraction.permalink + '.json';
-    });
-
-    console.log('attractionURLs:', attractionURLs);
-
-    // return Promise.all(
-    //   response.data.
-    // )
-  }, function(error) {
-    console.log('Failed!', error);
+  }).catch(function(err) {
+    console.log('error:', err);
   });
+
 
 // var attractionsPromise;
 //
