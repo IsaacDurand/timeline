@@ -5,32 +5,24 @@
 // Compare it to lists on Disneyland.com and Wikipedia.
 
 console.log('main.js is running');
+var axios = require('axios');
 
-// inspired by http://www.html5rocks.com/en/tutorials/es6/promises/ and http://www.html5rocks.com/en/tutorials/cors/
+// inspired by http://www.html5rocks.com/en/tutorials/es6/promises/ and https://github.com/mzabriskie/axios
 function get(url) {
   return new Promise(function(resolve, reject) {
 
-    var req = new XMLHttpRequest(); // part of the Web API
-    req.open('GET', url);
-
-    req.onload = function() {
-      if (req.status === 200) {
-        resolve(req.response);
-      } else {
-        reject(Error(req.statusText));
-      }
-    };
-
-    req.onerror = function() {
-      reject(Error('Network Error'));
-    };
-
-    req.send();
+    axios.get(url)
+      .then(function(response) {
+        resolve(response);
+      })
+      . catch(function(response) {
+        reject(Error(response));
+      });
   })
 }
 
 get('https://touringplans.com/disneyland/attractions.json').then(function(response) {
-  console.log('Success!', response);
+  console.log('Success!', response.data);
 }, function(error) {
   console.log('Failed!', error);
 });
