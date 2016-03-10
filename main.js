@@ -8,6 +8,7 @@
 
 console.log('main.js is running');
 var axios = require('axios');
+var cheerio = require('cheerio');
 var fs = require('fs');
 
 // inspired by http://www.html5rocks.com/en/tutorials/es6/promises/ and https://github.com/mzabriskie/axios
@@ -39,6 +40,23 @@ function getOpeningDate(attraction) {
   });
 }
 
+function getLand(attraction) {
+  var url = attraction.htmlLink;
+
+  return new Promise(function(resolve, reject) {
+
+    axios.get(url)
+      .then(function(response) {
+        $ = cheerio.load(response.data);
+        var land = $('h4').eq(0).text().slice(21);
+        resolve(land);
+      })
+      .catch(function(response) {
+        reject(Error(response));
+      });
+  });
+}
+
 var attractions; // I need to declare attractions outside the chain so that it's defined throughout.
 
 get('https://touringplans.com/disneyland/attractions.json')
@@ -61,8 +79,18 @@ get('https://touringplans.com/disneyland/attractions.json')
   }).then(function(openingDates) {
     attractions.forEach(function(attraction, index) {
       attraction.opened_on = openingDates[index];
-    })
+    });
     // Now attractions contains the opening date of each attraction.
+
+    return Promise.all(
+      attractions.map(getLand)
+    );
+    // getLand(attractions[0]).then(function(response) {
+    //   console.log(response);
+  }).then(function(lands) {
+    attractions.forEach(function(attraction, index) {
+      attraction.land = lands[index];
+    });
 
     fs.writeFile('attractions.json', JSON.stringify(attractions), function() {
       console.log('finished writing');
