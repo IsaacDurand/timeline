@@ -6,37 +6,6 @@
   </head>
   <body>
     We're building magic.
-    <!-- <script src="./main.js"></script> -->
-    <script>
-    function get(url) {
-      return new Promise(function(resolve, reject) {
-
-        var req = new XMLHttpRequest(); // part of the Web API
-        req.open('GET', url);
-
-        req.onload = function() {
-          if (req.status === 200) {
-            resolve(req.response);
-          } else {
-            reject(Error(req.statusText));
-          }
-        };
-
-        req.onerror = function() {
-          reject(Error('Network Error'));
-        };
-
-        req.setRequestHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // Attempt to address this error message: XMLHttpRequest cannot load https://touringplans.com/disneyland/attractions/. Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:3000' is therefore not allowed access. The response had HTTP status code 404.
-
-        req.send();
-      })
-    }
-
-    get('https://touringplans.com/disneyland/attractions/').then(function(response) {
-      console.log('Success!', response);
-    }, function(error) {
-      console.log('Failed!', error);
-    });
-    </script>
+    <!-- <script src="main.js"></script> -->
   </body>
 </html>

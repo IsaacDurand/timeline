@@ -4,7 +4,9 @@
 // Look at how beautiful my new object is! Maybe send it as json?
 // Compare it to lists on Disneyland.com and Wikipedia.
 
-// inspired by http://www.html5rocks.com/en/tutorials/es6/promises/
+console.log('main.js is running');
+
+// inspired by http://www.html5rocks.com/en/tutorials/es6/promises/ and http://www.html5rocks.com/en/tutorials/cors/
 function get(url) {
   return new Promise(function(resolve, reject) {
 
@@ -27,7 +29,7 @@ function get(url) {
   })
 }
 
-get('https://touringplans.com/disneyland/attractions/').then(function(response) {
+get('https://touringplans.com/disneyland/attractions.json').then(function(response) {
   console.log('Success!', response);
 }, function(error) {
   console.log('Failed!', error);
