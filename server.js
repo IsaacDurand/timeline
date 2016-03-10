@@ -10,4 +10,8 @@ app.get('/main.js', function(req, res) {
 	res.sendFile(path.join(__dirname, 'main.js'));
 });
 
+app.get('/attractions', function(req, res) {
+	res.sendFile(path.join(__dirname, 'attractions.json'));
+});
+
 app.listen(3000);
