@@ -25,7 +25,7 @@ function get(url) {
 }
 
 function getOpeningDate(attraction) {
-  var url = attraction.fullLink;
+  var url = attraction.jsonLink;
 
   return new Promise(function(resolve, reject) {
 
@@ -39,27 +39,6 @@ function getOpeningDate(attraction) {
   });
 }
 
-// I tested this function, and it works.
-// function getOpeningDate(url) {
-//   return new Promise(function(resolve, reject) {
-//
-//     axios.get(url)
-//       .then(function(response) {
-//         resolve(response.data.opened_on);
-//       })
-//       .catch(function(response) {
-//         reject(Error(response));
-//       });
-//   });
-// }
-
-// getOpeningDate('https://touringplans.com/disneyland/attractions/tarzans-treehouse.json')
-//   .then(function(response) {
-//     console.log('opening date:', response);
-//   }, function(error) {
-//     console.log('Request for opening date failed.');
-//   });
-
 var attractions; // I need to declare attractions outside the chain so that it's defined throughout.
 
 get('https://touringplans.com/disneyland/attractions.json')
@@ -69,9 +48,11 @@ get('https://touringplans.com/disneyland/attractions.json')
 
     attractions = response.data;
     attractions.forEach(function(attraction) {
-      attraction.fullLink = 'https://touringplans.com/disneyland/attractions/' + attraction.permalink + '.json';
+      attraction.htmlLink = 'https://touringplans.com/disneyland/attractions/' + attraction.permalink;
+      attraction.jsonLink = attraction.htmlLink + '.json';
+
     });
-    // Now atttractions contains the fullLink of each attraction.
+    // Now atttractions contains the jsonLink of each attraction.
 
     return Promise.all(
       attractions.map(getOpeningDate)
