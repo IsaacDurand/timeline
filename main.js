@@ -21,11 +21,53 @@ function get(url) {
   })
 }
 
-get('https://touringplans.com/disneyland/attractions.json').then(function(response) {
-  console.log('Success!', response.data);
-}, function(error) {
-  console.log('Failed!', error);
-});
+get('https://touringplans.com/disneyland/attractions.json')
+  .then(function(response) {
+    console.log('Success!');
+    // response.data is an array containing attraction objects.
+    var attractions = response.data;
+
+    attractions.forEach(function(attraction) {
+      attraction.URL = 'https://touringplans.com/disneyland/attractions/' + attraction.permalink + '.json';
+    });
+
+    // Now atttractions contains the full URL of each attraction.
+
+    console.log(attractions);
+
+    response.data.forEach(function(attraction) {
+      console.log(attraction.name);
+    })
+
+    var attractionURLs = response.data.map(function(atraction) {
+      return 'https://touringplans.com/disneyland/attractions/' + attraction.permalink + '.json';
+    });
+
+    console.log('attractionURLs:', attractionURLs);
+
+    // return Promise.all(
+    //   response.data.
+    // )
+  }, function(error) {
+    console.log('Failed!', error);
+  });
+
+// var attractionsPromise;
+//
+// function getOpeningDateForAttraction(i) {
+//   console.log('in getOpeningDateForAttraction. i is', i);
+//   attractionsPromise = attractionsPromise || get('https://touringplans.com/disneyland/attractions.json');
+//   return attractionsPromise.then(function(attractions) {
+//     return get('https://touringplans.com/disneyland/attractions/' + attractions[i].permalink + '.json');
+//   });
+// }
+//
+// getOpeningDateForAttraction(0).then(function(attraction) {
+//   console.log(attraction);
+//   return getOpeningDateForAttraction(1);
+// }).then(function(attraction) {
+//   console.log(attraction);
+// })
 
 // OLD
 // var fs = require('fs');
